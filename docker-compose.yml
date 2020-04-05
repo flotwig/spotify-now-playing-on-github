@@ -1,0 +1,22 @@
+version: '3.1'
+
+services:
+  postgres:
+    image: postgres
+
+  app:
+    image: node
+    working_dir: /app
+    entrypoint: yarn watch
+    environment:
+      - PORT=80
+    volumes:
+      - ./:/app
+
+  nginx:
+    image: nginx
+    ports:
+      - 4000:80
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./dist:/var/www:ro
