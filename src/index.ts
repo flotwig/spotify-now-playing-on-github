@@ -9,6 +9,7 @@ import * as GitHubOauth from './controllers/github-oauth'
 import * as GitHub from './github'
 import { state } from './controllers/state'
 import * as Task from './task'
+import * as bodyParser from 'body-parser'
 import axios from 'axios'
 
 const { log } = console
@@ -78,7 +79,23 @@ function start() {
     maybeSetPairForSession(req)
     next()
   })
-  app.get('/state', state)
+  app.use('/state', bodyParser.json())
+  app.post('/state', (req, res, next) => {
+    if (req.body.pair) {
+      if (typeof req.body.pair.active === 'boolean') {
+        return db.Pair.createFromUniqueIds(req.session.pair)
+        .then(pair => {
+          pair.set('active', req.body.pair.active)
+          req.session.pair = pair
+          return pair.save()
+        })
+        .then(() => next())
+      }
+    }
+
+    next()
+  })
+  app.all('/state', state)
 
   app.use('*', (_req, res) => {
     res.status(404).sendFile(`${distDir}/404.html`)

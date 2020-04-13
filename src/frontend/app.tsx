@@ -29,6 +29,24 @@ export default class App extends React.Component {
     })
   }
 
+  _setRemotePair(pair: Partial<State['pair']>) {
+    this.setState(undefined)
+
+    fetch('/state', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ pair })
+    })
+    .then(res => {
+      return res.json()
+    })
+    .then(res => {
+      this.setState({ remote: res })
+    })
+  }
+
   render() {
     return (
       <div className="app">
@@ -109,7 +127,7 @@ export default class App extends React.Component {
       <span className="subtle">
         Last sync at: {pair.lastCheckedAt || 'never synced'}<br/>
         Total number of syncs: {pair.syncs || 'never synced'}<br/>
-        Currently active: {pair.active ? 'yes': 'no'}
+        Currently active: {pair.active ? 'yes': 'no'} <a href="#" onClick={() => this._setRemotePair({ active: !pair.active })}>{pair.active ? '[pause syncing?]' : '[resume syncing]'}</a>
       </span>
     </div>
   }
