@@ -7,6 +7,9 @@ import githubLogo from './assets/github.png'
 // @ts-ignore
 import spotifyLogo from './assets/spotify.png'
 
+// @ts-ignore
+import screenshot from './assets/ss.png'
+
 import './app.scss'
 
 export default class App extends React.Component {
@@ -29,14 +32,17 @@ export default class App extends React.Component {
   render() {
     return (
       <div className="app">
-        <h1>Welcome to <code>now-playing</code>!</h1>
-        This is a tool that replicates your "Now Playing" status from Spotify to GitHub:
-        insert photo here
+        <h1>Welcome to <code>np.chary.us</code>!</h1>
+        This is a tool that replicates your "Now Playing" status from Spotify to GitHub, so it shows up as your user status on your profile. It looks something like this:
+        <img style={{ display: 'block', margin: 'auto' }} src={screenshot} alt="Screenshot of Now Playing on GitHub profile"/>
         <div className="wizard">
           {this._renderSpotifyConnect()}
           {this._renderGitHubConnect()}
         </div>
         {this._renderPair()}
+        <div className="footer">
+          Visit the <a href="https://github.com/flotwig/spotify-now-playing-on-github">GitHub repo</a> to report bugs or request features.
+        </div>
       </div>
     )
   }
@@ -47,7 +53,7 @@ export default class App extends React.Component {
     return (
       <div className="connect spotify">
         <a href="/spotify/auth" className="button">
-          <img src={spotifyLogo}/> Connect Spotify
+          <img src={spotifyLogo} alt=""/> Connect Spotify
         </a>
         <div className="status">
           {remote ? (
@@ -66,11 +72,11 @@ export default class App extends React.Component {
     return (
       <div className="connect github">
         <a href="/github/auth" className="button">
-          <img src={githubLogo}/> Connect GitHub
+          <img src={githubLogo} alt=""/> Connect GitHub
         </a>
         <div className="status">
           {remote ? (
-            remote.githubUser ? `✔ Connected as ${remote.githubUser.data.viewer.login}!`
+            remote.githubUser ? `✔ Connected as ${remote.githubUser.login}!`
             : <span className="subtle">❌ Not connected.</span>
             ) : <span className="subtle">Loading...</span>
           }
@@ -104,7 +110,6 @@ export default class App extends React.Component {
         Last sync at: {pair.lastCheckedAt || 'never synced'}<br/>
         Total number of syncs: {pair.syncs || 'never synced'}<br/>
         Currently active: {pair.active ? 'yes': 'no'}
-
       </span>
     </div>
   }

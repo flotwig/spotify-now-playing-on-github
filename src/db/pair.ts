@@ -10,8 +10,9 @@ export class Pair extends Sequelize.Model<Pair> {
   public spotifyRefreshToken!: string
   public githubUniqueId!: string
   public githubToken!: string
-  public lastStatus!: string | null
   public lastManualStatus!: GitHubUserStatus | null
+  public lastManualStatusWasNull!: boolean
+  public lastNowPlayingAt!: Date | null
   public lastCheckedAt!: Date | null
   public syncs!: number
   public active!: boolean
@@ -23,11 +24,16 @@ export class Pair extends Sequelize.Model<Pair> {
       where: pickBy(pick(props, 'githubUniqueId', 'spotifyUniqueId')),
       defaults: {
         ...props,
-        active: true
       }
     }).then(([pair]) => {
-      return pair.set(props)
+      pair.set(props)
+
+      return pair.save()
     })
+  }
+
+  static getActive () {
+    return Pair.findAll({ where: { active: true }})
   }
 }
 
@@ -61,6 +67,14 @@ export function init(sequelize: Sequelize.Sequelize) {
       type: Sequelize.JSON,
       allowNull: true
     },
+    lastManualStatusWasNull: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false
+    },
+    lastNowPlayingAt: {
+      type: Sequelize.DATE,
+      allowNull: true
+    },
     lastCheckedAt: {
       type: Sequelize.DATE,
       allowNull: true
@@ -74,7 +88,7 @@ export function init(sequelize: Sequelize.Sequelize) {
       type: Sequelize.BOOLEAN,
       defaultValue: false,
       allowNull: false
-    },
+    }
   }, {
     tableName: 'pairs',
     updatedAt: false,

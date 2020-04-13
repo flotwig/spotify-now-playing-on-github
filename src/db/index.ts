@@ -5,7 +5,14 @@ type DbOpts = {
   dbUrl: string
 }
 
-export function create({ dbUrl }: DbOpts) {
+export type Pair = PairModel.Pair
+
+export type Db = {
+  Pair: typeof PairModel.Pair
+}
+
+
+export function create({ dbUrl }: DbOpts): Db {
   const sequelize = new Sequelize(dbUrl, { dialect: 'postgres' })
 
   const Pair = PairModel.init(sequelize)

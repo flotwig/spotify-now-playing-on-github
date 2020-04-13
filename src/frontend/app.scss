@@ -33,6 +33,14 @@ $text: rgb(25, 27, 26);
     }
   }
 
+  .footer {
+    display: block;
+    width: 100%;
+    text-align: center;
+    opacity: .7;
+    font-size: .8em;
+  }
+
   .wizard {
     width: 100%;
     display: flex;

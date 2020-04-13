@@ -7,11 +7,15 @@ import * as SpotifyOauth from './controllers/spotify-oauth'
 import * as Spotify from './spotify'
 import * as GitHubOauth from './controllers/github-oauth'
 import * as GitHub from './github'
-import * as State from './controllers/state'
+import { state } from './controllers/state'
+import * as Task from './task'
+import axios from 'axios'
 
 const { log } = console
 
 const distDir = path.resolve(__dirname, '../dist')
+
+axios.defaults.headers['user-agent'] = 'https://github.com/flotwig/spotify-now-playing-on-github'
 
 function start() {
   const app = Express()
@@ -25,7 +29,8 @@ function start() {
     }
 
     return db.Pair.createFromUniqueIds({
-      githubUniqueId: req.session.githubUser.data.viewer.id,
+      active: true,
+      githubUniqueId: req.session.githubUser.id,
       githubToken: req.session.githubAuthInfo.accessToken,
       spotifyUniqueId: req.session.spotifyUser.id,
       spotifyToken: req.session.spotifyAuthInfo.accessToken,
@@ -50,7 +55,7 @@ function start() {
     baseUrl: Config.baseUrl,
     onAuthenticated: async (req, res, authInfo) => {
       req.session.spotifyAuthInfo = authInfo
-      req.session.spotifyUser = await spotify.getUser(authInfo.accessToken)
+      req.session.spotifyUser = await spotify.getUser(authInfo.accessToken, authInfo.refreshToken)
       await maybeSetPairForSession(req)
       res.redirect('/')
     },
@@ -69,7 +74,11 @@ function start() {
     ...Config.github
   })(app)
 
-  State.create()(app)
+  app.use('/state', (req, res, next) => {
+    maybeSetPairForSession(req)
+    next()
+  })
+  app.get('/state', state)
 
   app.use('*', (_req, res) => {
     res.status(404).sendFile(`${distDir}/404.html`)
@@ -78,6 +87,8 @@ function start() {
   app.listen(Config.port, () => {
     log(`Listening on ${Config.port}`)
   })
+
+  Task.start(db, spotify, github)
 }
 
 start()
