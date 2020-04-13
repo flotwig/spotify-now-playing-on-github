@@ -7,9 +7,8 @@ import * as SpotifyOauth from './controllers/spotify-oauth'
 import * as Spotify from './spotify'
 import * as GitHubOauth from './controllers/github-oauth'
 import * as GitHub from './github'
-import { state } from './controllers/state'
+import * as state from './controllers/state'
 import * as Task from './task'
-import * as bodyParser from 'body-parser'
 import axios from 'axios'
 
 const { log } = console
@@ -75,27 +74,7 @@ function start() {
     ...Config.github
   })(app)
 
-  app.use('/state', (req, res, next) => {
-    maybeSetPairForSession(req)
-    next()
-  })
-  app.use('/state', bodyParser.json())
-  app.post('/state', (req, res, next) => {
-    if (req.body.pair) {
-      if (typeof req.body.pair.active === 'boolean') {
-        return db.Pair.createFromUniqueIds(req.session.pair)
-        .then(pair => {
-          pair.set('active', req.body.pair.active)
-          req.session.pair = pair
-          return pair.save()
-        })
-        .then(() => next())
-      }
-    }
-
-    next()
-  })
-  app.all('/state', state)
+  state.install(app, db, maybeSetPairForSession)
 
   app.use('*', (_req, res) => {
     res.status(404).sendFile(`${distDir}/404.html`)

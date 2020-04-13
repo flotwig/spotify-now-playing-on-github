@@ -62,11 +62,13 @@ export function start(db: Db.Db, spotify: SpotifyApi, github: GitHubApi) {
 
     const _log = (...args) => log(`spotify user: ${pair.spotifyUniqueId} - gh user: ${ghUser.login} -`, ...args)
 
-    if (np.is_playing) {
+    const shouldSync = np.is_playing && (pair.syncExplicit || !np.item.explicit)
+
+    if (shouldSync) {
       // attempt to update the user's GitHub status
       const message = formatStatus(np)
 
-      _log('is_playing is true, setting status:', message)
+      _log('shouldSync is true, setting status:', message)
 
       const lastNowPlayingAt = pair.lastNowPlayingAt
 
@@ -97,7 +99,7 @@ export function start(db: Db.Db, spotify: SpotifyApi, github: GitHubApi) {
       return pair.lastManualStatus
     }
 
-    _log('not playing anything')
+    _log('not playing anything syncable')
 
     // not playing anything
     // if the user has a status set with a newer timestamp than now, we can quit now

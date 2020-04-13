@@ -127,7 +127,8 @@ export default class App extends React.Component {
       <span className="subtle">
         Last sync at: {pair.lastCheckedAt || 'never synced'}<br/>
         Total number of syncs: {pair.syncs || 'never synced'}<br/>
-        Currently active: {pair.active ? 'yes': 'no'} <a href="#" onClick={() => this._setRemotePair({ active: !pair.active })}>{pair.active ? '[pause syncing?]' : '[resume syncing]'}</a>
+        Currently active: {pair.active ? 'yes': 'no'} <a href="#" onClick={() => this._setRemotePair({ active: !pair.active })}>{pair.active ? '[pause syncing]' : '[resume syncing]'}</a><br/>
+        Sync explicit songs? {pair.syncExplicit ? 'yes': 'no'} <a href="#" onClick={() => this._setRemotePair({ syncExplicit: !pair.syncExplicit })}>[toggle]</a><br/>
       </span>
     </div>
   }

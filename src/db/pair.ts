@@ -14,6 +14,7 @@ export class Pair extends Sequelize.Model<Pair> {
   public lastManualStatusWasNull!: boolean
   public lastNowPlayingAt!: Date | null
   public lastCheckedAt!: Date | null
+  public syncExplicit!: boolean
   public syncs!: number
   public active!: boolean
 
@@ -78,6 +79,10 @@ export function init(sequelize: Sequelize.Sequelize) {
     lastCheckedAt: {
       type: Sequelize.DATE,
       allowNull: true
+    },
+    syncExplicit: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: false
     },
     syncs: {
       type: Sequelize.INTEGER,
