@@ -77,7 +77,7 @@ function start() {
   state.install(app, db, maybeSetPairForSession)
 
   app.use('*', (_req, res) => {
-    res.status(404).sendFile(`${distDir}/404.html`)
+    res.redirect('/')
   })
 
   app.listen(Config.port, () => {
