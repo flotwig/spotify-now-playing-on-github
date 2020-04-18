@@ -15,7 +15,25 @@ export type State = {
 const WRITEABLE_KEYS = ['active', 'syncExplicit']
 
 export function install(app: Application, db: Db.Db, maybeSetPairForSession) {
-  function stateHandler (req, res) {
+  app.use('/state', bodyParser.json())
+  app.post('/state', async (req, res) => {
+    await maybeSetPairForSession(req)
+
+    if (req.body && req.body.pair && req.session.pair) {
+      let writes = pick(req.body.pair, WRITEABLE_KEYS)
+
+      if (!isEmpty(writes)) {
+        writes = mapValues(writes, Boolean)
+
+        await db.Pair.createFromUniqueIds(req.session.pair)
+        .then(pair => {
+          pair.set(writes)
+          req.session.pair = pair
+          return pair.save()
+        })
+      }
+    }
+
     const state: State = {
       githubUser: req.session.githubUser,
       spotifyUser: req.session.spotifyUser,
@@ -23,30 +41,5 @@ export function install(app: Application, db: Db.Db, maybeSetPairForSession) {
     }
 
     res.json(state)
-  }
-
-  app.use('/state', async (req, res, next) => {
-    await maybeSetPairForSession(req)
-    next()
   })
-  app.use('/state', bodyParser.json())
-  app.post('/state', (req, res, next) => {
-    if (req.body && req.body.pair && req.session.pair) {
-      let writes = pick(req.body.pair, WRITEABLE_KEYS)
-      if (!isEmpty(writes)) {
-        writes = mapValues(writes, Boolean)
-
-        return db.Pair.createFromUniqueIds(req.session.pair)
-        .then(pair => {
-          pair.set(writes)
-          req.session.pair = pair
-          return pair.save()
-        })
-        .then(() => next())
-      }
-    }
-
-    next()
-  })
-  app.all('/state', stateHandler)
 }

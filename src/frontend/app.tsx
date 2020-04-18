@@ -20,13 +20,7 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
-    fetch('/state')
-    .then(res => {
-      return res.json()
-    })
-    .then(res => {
-      this.setState({ remote: res })
-    })
+    this._setRemotePair({})
   }
 
   _setRemotePair(pair: Partial<State['pair']>) {
