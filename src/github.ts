@@ -12,7 +12,7 @@ export type GitHubUser = {
 
 export type GitHubUserStatus = {
   emoji: string
-  message: string
+  message: string | null
   // organizationId: string
   // limitedAvailability: boolean
   // expiresAt: string
@@ -73,7 +73,7 @@ export function create({ apiUrl }: GitHubOpts) {
 
     setUserStatus: (accessToken, { emoji, message }: Partial<GitHubUserStatus>): Promise<GitHubUserStatus> => {
       return (send(accessToken, `mutation {
-        changeUserStatus(input: { emoji: "${escapeString(emoji)}", message: "${escapeString(message)}" }) {
+        changeUserStatus(input: { emoji: "${emoji}", message: "${message ? escapeString(message) : message}" }) {
           status {
             emoji
             message
