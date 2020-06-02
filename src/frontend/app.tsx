@@ -1,4 +1,5 @@
 import * as React from 'react'
+import GitHubButton from 'react-github-btn'
 import { State } from '../controllers/state'
 
 // @ts-ignore
@@ -11,6 +12,9 @@ import spotifyLogo from './assets/spotify.png'
 import screenshot from './assets/ss.png'
 
 import './app.scss'
+
+// eslint-disable-next-line
+const _GitHubButton: any = GitHubButton
 
 export default class App extends React.Component {
   state: {
@@ -53,7 +57,10 @@ export default class App extends React.Component {
         </div>
         {this._renderPair()}
         <div className="footer">
-          Visit the <a href="https://github.com/flotwig/spotify-now-playing-on-github">GitHub repo</a> to report bugs or request features.
+          Visit the <a href="https://github.com/flotwig/spotify-now-playing-on-github">GitHub repo</a> to report bugs or request features.<br/>
+          <_GitHubButton href="https://github.com/flotwig/spotify-now-playing-on-github" data-icon="octicon-star" data-show-count="true" aria-label="Star flotwig/spotify-now-playing-on-github on GitHub">
+            Star
+          </_GitHubButton>
         </div>
       </div>
     )
